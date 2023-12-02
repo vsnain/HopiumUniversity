@@ -1,12 +1,15 @@
 // pages/index.js
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import ResponsiveAppBar from '../components/Navigation/Navbar/index';
 
-const Layout = () => {
+
+
+const Layout = ({ children }) => {
   return (
     <div>
       <ResponsiveAppBar />
+      {/* <div>{children}</div> */}
     </div>
   );
 };

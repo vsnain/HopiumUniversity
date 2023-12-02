@@ -12,9 +12,14 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import Link from 'next/link';
 // import '../../../global.css';
+import Leetcode from '../../../pages/leetcode';
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = [
+  { label: 'Leetcode', subUrl: '/leetcode' },
+  { label: 'Compete', subUrl: '/compete' },
+];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
@@ -42,7 +47,6 @@ function ResponsiveAppBar() {
     style={{
       background: 'linear-gradient(to bottom, #7a661b, #21130d)'
     }}
-    
     >
       
       <Container maxWidth="xl">
@@ -52,7 +56,7 @@ function ResponsiveAppBar() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -63,7 +67,7 @@ function ResponsiveAppBar() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            HU
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -96,8 +100,13 @@ function ResponsiveAppBar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                // <MenuItem key={page.label} onClick={handleCloseNavMenu} >
+                //   <Typography textAlign="center">{page.label}</Typography>
+                // </MenuItem>
+                <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                  <Link href={page.subUrl} style={{ textDecoration: 'none' }}>
+                    <Typography sx={{ my: 2, color: 'black'}} textAlign="center">{page.label}</Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -107,7 +116,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -119,17 +128,22 @@ function ResponsiveAppBar() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            HU
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
+              // <Button
+              //   key={page.label}
+              //   onClick={handleCloseNavMenu}
+              //   sx={{ my: 2, color: 'white', display: 'block' }}
+              // >
+              //   {page.label}
+              // </Button>
+              <Link  style={{ textDecoration: 'none' }} href={page.subUrl} key={page.label}>
+                <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleCloseNavMenu}>
+                  {page.label}
+                </Button>
+              </Link>
             ))}
           </Box>
 
