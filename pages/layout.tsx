@@ -2,7 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import ResponsiveAppBar from '../components/Navigation/Navbar/index';
-
+import 'tailwindcss/tailwind.css';
 
 
 const Layout = ({ children }) => {
