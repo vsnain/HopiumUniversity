@@ -16,7 +16,7 @@ import Link from 'next/link';
 // import '../../../global.css';
 import Leetcode from '../../../pages/leetcode';
 import { useAuth } from '../../AuthContext';
-
+import { useSession } from 'next-auth/react';
 // {label: 'Job-Graph', subUrl: '/openjobs'}
 
 const pages = [
@@ -28,7 +28,8 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 
 function ResponsiveAppBar() {
-  const { isLoggedIn, login, logout } = useAuth();
+  
+  const { isLoggedIn,userImage, login, logout } = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -155,8 +156,15 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              </IconButton> */}
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                {isLoggedIn ? (
+                  <Avatar alt="User" src={userImage || "/static/images/avatar/default.jpg"} />
+                ) : (
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                )}
               </IconButton>
             </Tooltip>
             <Menu
