@@ -14,7 +14,7 @@ const easyQuestions = [
     { title: 'Invert Binary Tree', rating: 4, link: 'https://leetcode.com/problems/invert-binary-tree/' },
     { title: 'Robot Return to Origin', rating: 4, link: 'https://leetcode.com/problems/robot-return-to-origin/description/' },
     { title: 'Reverse Linked List', rating: 5, link: 'https://leetcode.com/problems/reverse-linked-list/' },
-    { title: 'Pascal's Triangle', rating: 5, link: 'https://leetcode.com/problems/pascals-triangle/' },
+    { title: 'Pascals Triangle', rating: 5, link: 'https://leetcode.com/problems/pascals-triangle/' },
     { title: 'Average of Levels in Binary Tree', rating: 4, link: 'https://leetcode.com/problems/average-of-levels-in-binary-tree/' },
     { title: 'Search in a Binary Search Tree', rating: 4, link: 'https://leetcode.com/problems/search-in-a-binary-search-tree/' },
     { title: 'Search in a Binary Search Tree', rating: 4, link: 'https://leetcode.com/problems/search-in-a-binary-search-tree/' },

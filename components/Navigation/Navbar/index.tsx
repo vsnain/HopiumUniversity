@@ -15,14 +15,20 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Link from 'next/link';
 // import '../../../global.css';
 import Leetcode from '../../../pages/leetcode';
+import { useAuth } from '../../AuthContext';
+
+// {label: 'Job-Graph', subUrl: '/openjobs'}
 
 const pages = [
   { label: 'Leetcode', subUrl: '/leetcode' },
   { label: 'Compete', subUrl: '/compete' },
+  
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
+
 function ResponsiveAppBar() {
+  const { isLoggedIn, login, logout } = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -169,11 +175,21 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+            {isLoggedIn ? (
+              <>
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
+              </>
+              ) : (
+                <Link href="/login" passHref style={{ textDecoration: 'none' }}>
+                  <MenuItem component="a" onClick={handleCloseUserMenu} sx={{ textDecoration: 'none' }}>
+                    <Typography textAlign="center">Login</Typography>
+                  </MenuItem>
+                </Link>
+              )}
             </Menu>
           </Box>
         </Toolbar>
