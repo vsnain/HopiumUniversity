@@ -24,7 +24,7 @@ const Leetcode = () => {
     <Box mt={2} display="flex" flexDirection="column" alignItems="center">
       <Container maxWidth="md">
         <Grid container spacing={4} justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4} sm={4}>
             <Card
               sx={{
                 ...cardStyle,
@@ -38,7 +38,7 @@ const Leetcode = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4} sm={4}>
             <Card
               sx={{
                 ...cardStyle,
@@ -52,7 +52,7 @@ const Leetcode = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4} sm={4}>
             <Card
               sx={{
                 ...cardStyle,

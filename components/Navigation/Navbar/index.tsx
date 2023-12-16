@@ -16,8 +16,9 @@ import Link from 'next/link';
 // import '../../../global.css';
 import Leetcode from '../../../pages/leetcode';
 import { useAuth } from '../../AuthContext';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 // {label: 'Job-Graph', subUrl: '/openjobs'}
+
 
 const pages = [
   { label: 'Leetcode', subUrl: '/leetcode' },
@@ -197,6 +198,7 @@ function ResponsiveAppBar() {
                     <Typography textAlign="center">Login</Typography>
                   </MenuItem>
                 </Link>
+                
               )}
             </Menu>
           </Box>
