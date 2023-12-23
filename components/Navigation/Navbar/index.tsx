@@ -13,30 +13,26 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Link from 'next/link';
-// import '../../../global.css';
-import Leetcode from '../../../pages/leetcode';
-import { useAuth } from '../../AuthContext';
-import { signIn, useSession } from 'next-auth/react';
-// {label: 'Job-Graph', subUrl: '/openjobs'}
-
+import { useFirebaseAuth } from '../../../pages/login'; // Import the Firebase authentication hook
+import { useAuth } from '../../../pages/AuthUserProvider';
 
 const pages = [
   { label: 'Leetcode', subUrl: '/leetcode' },
   { label: 'Compete', subUrl: '/compete' },
-  
 ];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
+const settings = ['Profile', 'Logout'];
 
 function ResponsiveAppBar() {
-  
-  const { isLoggedIn,userImage, login, logout } = useAuth();
+  const { name, email, photo, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const user  = null; 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -50,13 +46,7 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static" 
-    variant="dense"
-    style={{
-      background: 'linear-gradient(to bottom, #7a661b, #21130d)'
-    }}
-    >
-      
+    <AppBar position="static" variant="dense" style={{ background: 'linear-gradient(to bottom, #7a661b, #21130d)' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -108,17 +98,17 @@ function ResponsiveAppBar() {
               }}
             >
               {pages.map((page) => (
-                // <MenuItem key={page.label} onClick={handleCloseNavMenu} >
-                //   <Typography textAlign="center">{page.label}</Typography>
-                // </MenuItem>
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Link href={page.subUrl} style={{ textDecoration: 'none' }}>
-                    <Typography sx={{ my: 2, color: 'black'}} textAlign="center">{page.label}</Typography>
+                    <Typography sx={{ my: 2, color: 'black' }} textAlign="center">
+                      {page.label}
+                    </Typography>
                   </Link>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
@@ -140,14 +130,7 @@ function ResponsiveAppBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              // <Button
-              //   key={page.label}
-              //   onClick={handleCloseNavMenu}
-              //   sx={{ my: 2, color: 'white', display: 'block' }}
-              // >
-              //   {page.label}
-              // </Button>
-              <Link  style={{ textDecoration: 'none' }} href={page.subUrl} key={page.label}>
+              <Link style={{ textDecoration: 'none' }} href={page.subUrl} key={page.label}>
                 <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleCloseNavMenu}>
                   {page.label}
                 </Button>
@@ -157,12 +140,9 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton> */}
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 {isLoggedIn ? (
-                  <Avatar alt="User" src={userImage || "/static/images/avatar/default.jpg"} />
+                  <Avatar alt="User" src={photo || '/static/images/avatar/default.jpg'} />
                 ) : (
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
                 )}
@@ -184,21 +164,20 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-            {isLoggedIn ? (
-              <>
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-              </>
+              {isLoggedIn ? (
+                <>
+                  {settings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Typography textAlign="center">{setting}</Typography>
+                    </MenuItem>
+                  ))}
+                </>
               ) : (
-                <Link href="/login" passHref style={{ textDecoration: 'none' }}>
+                <Link href="/" passHref style={{ textDecoration: 'none' }}>
                   <MenuItem component="a" onClick={handleCloseUserMenu} sx={{ textDecoration: 'none' }}>
                     <Typography textAlign="center">Login</Typography>
                   </MenuItem>
                 </Link>
-                
               )}
             </Menu>
           </Box>
@@ -207,4 +186,5 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
+
 export default ResponsiveAppBar;
