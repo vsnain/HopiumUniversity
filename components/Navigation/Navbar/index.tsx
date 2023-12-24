@@ -13,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Link from 'next/link';
-import { useFirebaseAuth } from '../../../pages/login'; // Import the Firebase authentication hook
 import { useAuth } from '../../../pages/AuthUserProvider';
 
 const pages = [
@@ -21,10 +20,9 @@ const pages = [
   { label: 'Compete', subUrl: '/compete' },
 ];
 
-const settings = ['Profile', 'Logout'];
 
 function ResponsiveAppBar() {
-  const { name, email, photo, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const { name, email, photo, uid, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
   const user  = null; 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -43,6 +41,14 @@ function ResponsiveAppBar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleMenuClick = (label: string) => {
+    if (label === 'Logout') {
+      signOut();
+      handleCloseUserMenu();
+    }
+    
   };
 
   return (
@@ -166,14 +172,20 @@ function ResponsiveAppBar() {
             >
               {isLoggedIn ? (
                 <>
-                  {settings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">{setting}</Typography>
-                    </MenuItem>
-                  ))}
+                  <MenuItem onClick={() => handleMenuClick('Profile')} >
+                    <Link href="/profile" passHref style={{ textDecoration: 'none', color:'black' }}>
+                      <Typography component="a" textAlign="center" sx={{ textDecoration: 'none' }}>
+                        Profile
+                      </Typography>
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('Logout')}>
+                    <Typography textAlign="center">Logout</Typography>
+                  </MenuItem>
                 </>
+                
               ) : (
-                <Link href="/" passHref style={{ textDecoration: 'none' }}>
+                <Link href="/" passHref style={{ textDecoration: 'none', color:'black' }}>
                   <MenuItem component="a" onClick={handleCloseUserMenu} sx={{ textDecoration: 'none' }}>
                     <Typography textAlign="center">Login</Typography>
                   </MenuItem>

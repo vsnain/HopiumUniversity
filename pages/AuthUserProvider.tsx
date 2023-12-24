@@ -33,6 +33,7 @@ export function AuthProvider({ children }) {
     name: authUser?.displayName || '',
     email: authUser?.email || '',
     photo: authUser?.photoURL || '',
+    uid:authUser?.uid||'',
     loading,
     isLoggedIn,
     signInWithGoogle,
