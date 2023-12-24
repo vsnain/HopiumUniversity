@@ -172,14 +172,14 @@ function ResponsiveAppBar() {
             >
               {isLoggedIn ? (
                 <>
-                  <MenuItem onClick={() => handleMenuClick('Profile')} >
+                  <MenuItem onClick={() => {handleMenuClick('Profile'); handleCloseUserMenu();}} >
                     <Link href="/profile" passHref style={{ textDecoration: 'none', color:'black' }}>
                       <Typography component="a" textAlign="center" sx={{ textDecoration: 'none' }}>
                         Profile
                       </Typography>
                     </Link>
                   </MenuItem>
-                  <MenuItem onClick={() => handleMenuClick('Logout')}>
+                  <MenuItem onClick={() => {handleMenuClick('Logout'); handleCloseUserMenu();}}>
                     <Typography textAlign="center">Logout</Typography>
                   </MenuItem>
                 </>

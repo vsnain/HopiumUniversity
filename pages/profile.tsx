@@ -3,7 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { useAuth } from './AuthUserProvider';
 
-// Define the styles as a JavaScript object
+const majorCities = [
+  'New York',
+  'London',
+  'Paris',
+  'Tokyo',
+  'Beijing',
+  'Sydney',
+  'Los Angeles',
+  'Berlin',
+  'Toronto',
+  'Dubai',
+];
+
 const styles = {
   profileContainer: {
     maxWidth: '600px',
@@ -33,6 +45,7 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '16px',
+    marginTop: '10px',
   },
   successMessage: {
     color: '#4caf50',
@@ -41,12 +54,13 @@ const styles = {
 };
 
 const Profile = ({ firestore }) => {
-  const { name, email, photo, uid, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const { uid, isLoggedIn } = useAuth();
   const [leetCodeUrl, setLeetCodeUrl] = useState('');
+  const [city, setCity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    const fetchLeetCodeUrl = async () => {
+    const fetchProfileData = async () => {
       try {
         if (isLoggedIn) {
           const userDocRef = doc(firestore, 'users', uid);
@@ -55,6 +69,7 @@ const Profile = ({ firestore }) => {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             setLeetCodeUrl(userData.leetCodeUrl || '');
+            setCity(userData.city || '');
           }
         }
       } catch (error) {
@@ -62,7 +77,7 @@ const Profile = ({ firestore }) => {
       }
     };
 
-    fetchLeetCodeUrl();
+    fetchProfileData();
   }, [isLoggedIn, uid, firestore]);
 
   const handleSubmit = async (e) => {
@@ -72,7 +87,7 @@ const Profile = ({ firestore }) => {
       if (isLoggedIn) {
         const userDocRef = doc(firestore, 'users', uid);
 
-        await setDoc(userDocRef, { leetCodeUrl }, { merge: true });
+        await setDoc(userDocRef, { leetCodeUrl, city }, { merge: true });
 
         setSuccessMessage('Changes saved successfully!');
       } else {
@@ -97,6 +112,21 @@ const Profile = ({ firestore }) => {
                 onChange={(e) => setLeetCodeUrl(e.target.value)}
                 style={styles.input}
               />
+            </label>
+            <label style={styles.label}>
+              City:
+              <input
+                type="text"
+                list="cities"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                style={styles.input}
+              />
+              <datalist id="cities">
+                {majorCities.map((city) => (
+                  <option key={city} value={city} />
+                ))}
+              </datalist>
             </label>
             <button type="submit" style={styles.button}>
               Save
