@@ -3,19 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { useAuth } from './AuthUserProvider';
 
-const majorCities = [
-  'New York',
-  'London',
-  'Paris',
-  'Tokyo',
-  'Beijing',
-  'Sydney',
-  'Los Angeles',
-  'Berlin',
-  'Toronto',
-  'Dubai',
-];
-
+// Define the styles as a JavaScript object
 const styles = {
   profileContainer: {
     maxWidth: '600px',
@@ -45,30 +33,42 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '16px',
-    marginTop: '10px',
   },
   successMessage: {
     color: '#4caf50',
     marginTop: '10px',
   },
+  errorMessage: {
+    color: '#f44336',
+    marginTop: '10px',
+  },
 };
 
 const Profile = ({ firestore }) => {
-  const { uid, isLoggedIn } = useAuth();
+  const { name, email, photo, uid, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
   const [leetCodeUrl, setLeetCodeUrl] = useState('');
   const [city, setCity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const extractUsernameFromUrl = (url) => {
+    // Extract username from the LeetCode URL or return the input as is if it's already a username
+    const match = url.match(/(?:https?:\/\/)?(?:www\.)?leetcode\.com\/([^/]+)\/?/);
+    return match ? match[1] : url;
+  };
+  
 
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const fetchLeetCodeUrl = async () => {
       try {
         if (isLoggedIn) {
           const userDocRef = doc(firestore, 'users', uid);
           const userDocSnap = await getDoc(userDocRef);
-
+          
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
-            setLeetCodeUrl(userData.leetCodeUrl || '');
+            const leetCodeUsername = extractUsernameFromUrl(userData.leetCodeUrl);
+            setLeetCodeUrl(leetCodeUsername || '');
             setCity(userData.city || '');
           }
         }
@@ -77,7 +77,7 @@ const Profile = ({ firestore }) => {
       }
     };
 
-    fetchProfileData();
+    fetchLeetCodeUrl();
   }, [isLoggedIn, uid, firestore]);
 
   const handleSubmit = async (e) => {
@@ -85,16 +85,43 @@ const Profile = ({ firestore }) => {
 
     try {
       if (isLoggedIn) {
-        const userDocRef = doc(firestore, 'users', uid);
+        // Convert user input to lowercase for case-insensitive comparison
+        const userInput = city.toLowerCase();
 
-        await setDoc(userDocRef, { leetCodeUrl, city }, { merge: true });
+        // Call the OpenDataSoft API
+        const apiResponse = await fetch(
+          `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?select=name%2Ccoordinates&where=%22${userInput}%22&limit=1`
+        );
+        const apiData = await apiResponse.json();
 
-        setSuccessMessage('Changes saved successfully!');
+        // Check if the city exists in the API response
+        if (apiData.total_count > 0) {
+          const apiCityData = apiData.results[0];
+          const apiCityName = apiCityData.name.toLowerCase();
+
+          // Check if the user input matches the API result
+          if (userInput === apiCityName) {
+            // Update the user's document in Firestore
+            const userDocRef = doc(firestore, 'users', uid);
+            await setDoc(userDocRef, { leetCodeUrl, city: apiCityData.name, coordinates: apiCityData.coordinates }, { merge: true });
+
+            setSuccessMessage('Changes saved successfully!');
+            setErrorMessage('');
+          } else {
+            setErrorMessage(`City '${city}' does not exist in our database.`);
+            setSuccessMessage('');
+          }
+        } else {
+          setErrorMessage(`City '${city}' does not exist in our database.`);
+          setSuccessMessage('');
+        }
       } else {
         console.error('User not logged in');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
+      setErrorMessage('An error occurred while updating the profile.');
+      setSuccessMessage('');
     }
   };
 
@@ -109,7 +136,7 @@ const Profile = ({ firestore }) => {
               <input
                 type="text"
                 value={leetCodeUrl}
-                onChange={(e) => setLeetCodeUrl(e.target.value)}
+                onChange={(e) => setLeetCodeUrl(extractUsernameFromUrl(e.target.value))}
                 style={styles.input}
               />
             </label>
@@ -117,22 +144,17 @@ const Profile = ({ firestore }) => {
               City:
               <input
                 type="text"
-                list="cities"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 style={styles.input}
               />
-              <datalist id="cities">
-                {majorCities.map((city) => (
-                  <option key={city} value={city} />
-                ))}
-              </datalist>
             </label>
             <button type="submit" style={styles.button}>
               Save
             </button>
           </form>
           {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
+          {errorMessage && <p style={styles.errorMessage}>{errorMessage}</p>}
         </div>
       )}
     </div>
