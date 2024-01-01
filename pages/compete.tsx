@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Grid, Box, Container, Typography } from '@mui/material';
 import UserList from './UserList';
-// import QuestionList from './QuestionList';
+import { collection, getDocs } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+import { firebaseConfig } from '../firebase.config';
+
+const firestore = getFirestore();
 
 const cardStyle = {
   height: '40px',
@@ -12,7 +16,7 @@ const cardStyle = {
   cursor: 'pointer',
 };
 
-const Leetcode = () => {
+const Compete = () => {
   const [selectedCard, setSelectedCard] = useState(null);
 
   const handleCardClick = (card) => {
@@ -76,4 +80,4 @@ const Leetcode = () => {
   );
 };
 
-export default Leetcode;
+export default Compete;

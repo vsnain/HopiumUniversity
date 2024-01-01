@@ -8,7 +8,6 @@ import ResponsiveAppBar from '../components/Navigation/Navbar';
 import { NextUIProvider } from '@nextui-org/react';
 import firebase from 'firebase/compat/app';
 import { firebaseConfig } from '../firebase.config';
-import { SessionProvider } from 'next-auth/react';
 import { AuthProvider } from './AuthUserProvider';
 import { getFirestore } from 'firebase/firestore';
 
