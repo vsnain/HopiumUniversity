@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { useAuth } from './AuthUserProvider';
 
+
+
 // Define the styles as a JavaScript object
 const styles = {
   profileContainer: {
@@ -45,7 +47,8 @@ const styles = {
 };
 
 const Profile = ({ firestore }) => {
-  const { name, email, photo, uid, loading, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const { name, email, photo, uid, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [leetCodeUrl, setLeetCodeUrl] = useState('');
   const [city, setCity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -80,33 +83,45 @@ const Profile = ({ firestore }) => {
     fetchLeetCodeUrl();
   }, [isLoggedIn, uid, firestore]);
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (isLoggedIn) {
+        setLoading(true);
         // Convert user input to lowercase for case-insensitive comparison
         const userInput = city.toLowerCase();
-
+  
         // Call the OpenDataSoft API
         const apiResponse = await fetch(
           `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?select=name%2Ccoordinates&where=%22${userInput}%22&limit=1`
         );
         const apiData = await apiResponse.json();
-
+  
         // Check if the city exists in the API response
         if (apiData.total_count > 0) {
           const apiCityData = apiData.results[0];
           const apiCityName = apiCityData.name.toLowerCase();
-
+  
           // Check if the user input matches the API result
           if (userInput === apiCityName) {
-            // Update the user's document in Firestore
-            const userDocRef = doc(firestore, 'users', uid);
-            await setDoc(userDocRef, { leetCodeUrl, city: apiCityData.name, coordinates: apiCityData.coordinates }, { merge: true });
-
-            setSuccessMessage('Changes saved successfully!');
-            setErrorMessage('');
+            // Update LeetCode stats
+            const leetCodeResponse = await fetch(`https://leetcode-stats-api.herokuapp.com/${leetCodeUrl}`);
+            const leetCodeData = await leetCodeResponse.json();
+  
+            if (leetCodeData.status === "success" && leetCodeData.message === "retrieved" && leetCodeData.totalSolved) {
+              // Update the user's document in Firestore
+              const userDocRef = doc(firestore, 'users', uid);
+              await setDoc(userDocRef, { leetCodeUrl, city: apiCityData.name, coordinates: apiCityData.coordinates, totalSolved: leetCodeData.totalSolved }, { merge: true });
+  
+              setSuccessMessage('Changes saved successfully!');
+              setErrorMessage('');
+            } else {
+              setErrorMessage(`Username '${leetCodeUrl}' not found or has no LeetCode stats.`);
+              setSuccessMessage('');
+            }
           } else {
             setErrorMessage(`City '${city}' does not exist in our database.`);
             setSuccessMessage('');
@@ -123,7 +138,13 @@ const Profile = ({ firestore }) => {
       setErrorMessage('An error occurred while updating the profile.');
       setSuccessMessage('');
     }
+    finally {
+      setLoading(false);
+    }
   };
+
+  
+
 
   return (
     <div style={styles.profileContainer}>
@@ -153,6 +174,7 @@ const Profile = ({ firestore }) => {
               Save
             </button>
           </form>
+          {loading && <p>Saving...</p>}
           {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
           {errorMessage && <p style={styles.errorMessage}>{errorMessage}</p>}
         </div>
