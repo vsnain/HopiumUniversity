@@ -9,7 +9,7 @@ const firestore = getFirestore();
 
 const cardStyle = {
   height: '40px',
-  border: '4px solid grey',
+  border: '4px solid #7a661b',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

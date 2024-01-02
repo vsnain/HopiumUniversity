@@ -8,7 +8,7 @@ import { useAuth } from './AuthUserProvider';
 
 const cardStyle = {
   height: '40px',
-  border: '4px solid grey',
+  border: '4px solid #7a661b',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -34,7 +34,7 @@ const Leetcode = () => {
             <Card
               sx={{
                 ...cardStyle,
-                backgroundColor: isCardSelected('easy') ? 'grey' : 'white',
+                backgroundColor: isCardSelected('easy') ? '#7a661b' : 'white',
                 marginBottom: '16px',
               }}
               onClick={() => handleCardClick('easy')}
@@ -48,7 +48,7 @@ const Leetcode = () => {
             <Card
               sx={{
                 ...cardStyle,
-                backgroundColor: isCardSelected('medium') ? 'grey' : 'white',
+                backgroundColor: isCardSelected('medium') ? '#7a661b' : 'white',
                 marginBottom: '16px',
               }}
               onClick={() => handleCardClick('medium')}
@@ -62,7 +62,7 @@ const Leetcode = () => {
             <Card
               sx={{
                 ...cardStyle,
-                backgroundColor: isCardSelected('hard') ? 'grey' : 'white',
+                backgroundColor: isCardSelected('hard') ? '#7a661b' : 'white',
                 marginBottom: '16px',
               }}
               onClick={() => handleCardClick('hard')}

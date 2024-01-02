@@ -3,6 +3,7 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 import { useAuth } from './AuthUserProvider';
 import Grid from '@mui/material/Grid';
+import Link from 'next/link';
 
 const firestore = getFirestore();
 
@@ -91,6 +92,8 @@ const UserList = () => {
   return (
     <div>
       {users.map((user, index) => (
+
+        <Link href={`https://leetcode.com/${user.leetCodeUrl}`} key={index} passHref style={{ textDecoration: 'none', color:'black' }}>
         <div
           key={index}
           style={{
@@ -110,10 +113,11 @@ const UserList = () => {
                 <p>{user.city}</p>
             </Grid>
             <Grid item xs={4} sm={4} sx={{ textAlign: 'center' }}>
-                <p>{user.problemsSolved || 0}</p>
+                <p>{user.totalSolved || 0}</p>
             </Grid>
         </Grid>
         </div>
+        </Link>
       ))}
     </div>
   );
