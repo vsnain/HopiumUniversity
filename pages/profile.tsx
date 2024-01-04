@@ -46,20 +46,21 @@ const styles = {
   },
 };
 
+
+
 const Profile = ({ firestore }) => {
-  const { name, email, photo, uid, isLoggedIn, signInWithGoogle, signOut } = useAuth();
+  const { uid, isLoggedIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [leetCodeUrl, setLeetCodeUrl] = useState('');
   const [city, setCity] = useState('');
+  const [studyGroup, setStudyGroup] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const extractUsernameFromUrl = (url) => {
-    // Extract username from the LeetCode URL or return the input as is if it's already a username
     const match = url.match(/(?:https?:\/\/)?(?:www\.)?leetcode\.com\/([^/]+)\/?/);
     return match ? match[1] : url;
   };
-  
 
   useEffect(() => {
     const fetchLeetCodeUrl = async () => {
@@ -67,12 +68,13 @@ const Profile = ({ firestore }) => {
         if (isLoggedIn) {
           const userDocRef = doc(firestore, 'users', uid);
           const userDocSnap = await getDoc(userDocRef);
-          
+
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             const leetCodeUsername = extractUsernameFromUrl(userData.leetCodeUrl);
             setLeetCodeUrl(leetCodeUsername || '');
             setCity(userData.city || '');
+            setStudyGroup(userData.studyGroup || '');
           }
         }
       } catch (error) {
@@ -83,39 +85,37 @@ const Profile = ({ firestore }) => {
     fetchLeetCodeUrl();
   }, [isLoggedIn, uid, firestore]);
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      if (isLoggedIn) {
+      if (isLoggedIn && leetCodeUrl && city && studyGroup) {
         setLoading(true);
-        // Convert user input to lowercase for case-insensitive comparison
         const userInput = city.toLowerCase();
-  
-        // Call the OpenDataSoft API
+
         const apiResponse = await fetch(
           `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?select=name%2Ccoordinates&where=%22${userInput}%22&limit=1`
         );
         const apiData = await apiResponse.json();
-  
-        // Check if the city exists in the API response
+
         if (apiData.total_count > 0) {
           const apiCityData = apiData.results[0];
           const apiCityName = apiCityData.name.toLowerCase();
-  
-          // Check if the user input matches the API result
+
           if (userInput === apiCityName) {
-            // Update LeetCode stats
             const leetCodeResponse = await fetch(`https://leetcode-stats-api.herokuapp.com/${leetCodeUrl}`);
             const leetCodeData = await leetCodeResponse.json();
-  
-            if (leetCodeData.status === "success" && leetCodeData.message === "retrieved" && leetCodeData.totalSolved) {
-              // Update the user's document in Firestore
+
+            if (leetCodeData.status === 'success' && leetCodeData.message === 'retrieved' && leetCodeData.totalSolved) {
               const userDocRef = doc(firestore, 'users', uid);
-              await setDoc(userDocRef, { leetCodeUrl, city: apiCityData.name, coordinates: apiCityData.coordinates, totalSolved: leetCodeData.totalSolved }, { merge: true });
-  
+              await setDoc(userDocRef, {
+                leetCodeUrl,
+                city: apiCityData.name,
+                coordinates: apiCityData.coordinates,
+                totalSolved: leetCodeData.totalSolved,
+                studyGroup,
+              }, { merge: true });
+
               setSuccessMessage('Changes saved successfully!');
               setErrorMessage('');
             } else {
@@ -131,20 +131,17 @@ const Profile = ({ firestore }) => {
           setSuccessMessage('');
         }
       } else {
-        console.error('User not logged in');
+        setErrorMessage('Please fill in all mandatory fields.');
+        setSuccessMessage('');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       setErrorMessage('An error occurred while updating the profile.');
       setSuccessMessage('');
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
-
-  
-
 
   return (
     <div style={styles.profileContainer}>
@@ -169,6 +166,18 @@ const Profile = ({ firestore }) => {
                 onChange={(e) => setCity(e.target.value)}
                 style={styles.input}
               />
+            </label>
+            <label style={styles.label}>
+              Are you looking for a study group?
+              <select
+                value={studyGroup}
+                onChange={(e) => setStudyGroup(e.target.value)}
+                style={styles.input}
+              >
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
             </label>
             <button type="submit" style={styles.button}>
               Save
